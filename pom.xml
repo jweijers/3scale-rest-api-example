@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>eu.jeroenweijers</groupId>
-    <artifactId>3scale-rest-api-example</artifactId>
+    <artifactId>3scaleRestExample</artifactId>
     <version>0.1.0</version>
 
     <parent>
