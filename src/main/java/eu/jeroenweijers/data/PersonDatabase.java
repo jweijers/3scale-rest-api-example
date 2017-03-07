@@ -9,21 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.UUID;
 
 @Singleton
 class PersonDatabase implements PersonRepository {
 
-    private static final int INITIAL_ID = 1;
-    private final AtomicLong counter = new AtomicLong(INITIAL_ID);
-    private final Map<Long, Person> persons = new HashMap<>();
+    private final Map<UUID, Person> persons = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        long first = counter.getAndIncrement();
-        persons.put(first, new Person(first, "Clark", "Kent"));
-        long second = counter.getAndIncrement();
-        persons.put(second, new Person(second, "Bruce", "Wayne"));
+        this.addPerson("Clark", "Kent");
+        this.addPerson("Bruce", "Wayne");
+        this.addPerson("Peter", "Parker");
+        this.addPerson("Alfred", "Pennyworth");
     }
 
     @Override
@@ -34,10 +32,34 @@ class PersonDatabase implements PersonRepository {
     }
 
     @Override
-    public Optional<Person> getPerson(long id) {
+    public Optional<Person> getPerson(UUID id) {
         if (persons.containsKey(id)) {
             return Optional.of(persons.get(id));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Person addPerson(String firstName, String lastName) {
+        UUID uuid = UUID.randomUUID();
+        Person person = new Person(uuid, firstName, lastName);
+        persons.put(uuid, person);
+        return person;
+    }
+
+    @Override
+    public boolean deletePerson(UUID id) {
+        return persons.remove(id) != null;
+    }
+
+    @Override
+    public Optional<Person> updatePerson(Person person) {
+        Person persistedPerson = persons.get(person.getId());
+        if (persistedPerson == null){
+            return Optional.empty();
+        }
+        persistedPerson.setFirstName(person.getFirstName());
+        persistedPerson.setLastName(person.getLastName());
+        return Optional.of(persistedPerson);
     }
 }
